@@ -35,6 +35,17 @@ export class ProductController {
         }
     }
 
+    public getByIds = async( request: express.Request, response: express.Response ) => {
+        try {
+            let result = await this.service.getbyIds( request.body );
+            response.send( result );
+        }
+        catch ( err ){
+            console.log( "product controller, getById", err );
+            response.send( err );
+        }
+    }
+
     public getByGender = async( request: express.Request, response: express.Response ) => {
         try {
             let result = await this.service.getByGender( request.params.id );

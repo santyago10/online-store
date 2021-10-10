@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import { ProductTypeRoute } from './routes/type.route';
 import { createConnection } from 'typeorm';
 import App from './app';
-import config from './ormconfig';
+import { config } from './ormconfig';
 import AdminRoute from './routes/admin.route';
 import { BrandRoute } from './routes/brand.route';
 import { SizeRoute } from './routes/size.route';
@@ -24,3 +24,5 @@ import { SentOrderRoute } from './routes/sent-order.route';
   );
   app.listen();
 })();
+
+// "dev": "nodemon --exec \"ts-node\" ./src/server.ts"

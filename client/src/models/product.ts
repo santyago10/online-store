@@ -11,8 +11,21 @@ export const ProductItem = types.model({
     photos: types.optional( types.string, "" ),
     gender_id: types.optional( types.number, 0 ),
     brand_id: types.optional( types.string, "" ),
-    type_id: types.optional( types.number, 0 )
+    type_id: types.optional( types.number, 0 ),
+    count: types.optional( types.number, 0 ),
+    sum: types.optional( types.number, 0 )
 })
 .actions( self =>({
 
+    setCurrentPrice( newPrice: number ) {
+        self.currentPrice = newPrice;
+    },
+
+    setCount( newCount: number, price: number ) {
+        let oldSum = self.sum
+        self.count = newCount;
+        debugger
+        self.sum = self.count * price + oldSum; 
+        return self.sum;
+    }
 }));

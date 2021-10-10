@@ -8,41 +8,24 @@ interface IReactRouterParams {
     match: any
 }
 
+export let genderId : string;
+
 @observer
 export class ProductTypeComponent extends React.Component<IReactRouterParams, {}> {
     render() {
+
         { 
-            if( productStore.gender === "man") {
+            genderId = this.props.match.params.gender;
+            if ( genderId === "men" || genderId === "woman" ) {
+
                 return <div className="woman-component">
-                    <NavLink to = "/man/products" onClick = { e => { productStore.setFiltersClient( "type_id", 5 ) } }>Trainers</NavLink>
-                    <NavLink to = "/man/products" onClick = { e => { productStore.setFiltersClient( "type_id", 2 ) } }>Hoodie</NavLink>
-                    <NavLink to = "/man/products" onClick = { e => { productStore.setFiltersClient( "type_id", 4 ) } }>Jacket</NavLink>
+                    <NavLink to = { `/${ genderId }/products` } onClick = { e => { productStore.setFiltersClient( "type_id", 5 ) } }>Trainers</NavLink>
+                    <NavLink to = { `/${ genderId }/products` } onClick = { e => { productStore.setFiltersClient( "type_id", 2 ) } }>Hoodie</NavLink>
+                    <NavLink to = { `/${ genderId }/products` } onClick = { e => { productStore.setFiltersClient( "type_id", 4 ) } }>Jacket</NavLink>
                 </div>
             }
-            else if ( productStore.gender === "woman") {
-                return <div className="woman-component">
-                    <NavLink to = "/woman/products" onClick = { e => { productStore.setFiltersClient( "type_id", 5 ) } }>Trainers</NavLink>
-                    <NavLink to = "/woman/products" onClick = { e => { productStore.setFiltersClient( "type_id", 2 ) } }>Hoodie</NavLink>
-                    <NavLink to = "/woman/products" onClick = { e => { productStore.setFiltersClient( "type_id", 4 ) } }>Jacket</NavLink>
-                </div>
-            }
-            else {
-                let genderId = this.props.match.params.gender;
-                if ( genderId === "man") {
-                    return <div className="woman-component">
-                        <NavLink to = "/man/products" onClick = { e => { productStore.setFiltersClient( "type_id", 5 ) } }>Trainers</NavLink>
-                        <NavLink to = "/man/products" onClick = { e => { productStore.setFiltersClient( "type_id", 2 ) } }>Hoodie</NavLink>
-                        <NavLink to = "/man/products" onClick = { e => { productStore.setFiltersClient( "type_id", 4 ) } }>Jacket</NavLink>
-                    </div>
-                }
-                else {
-                    return <div className="woman-component">
-                        <NavLink to = "/woman/products" onClick = { e => { productStore.setFiltersClient( "type_id", 5 ) } }>Trainers</NavLink>
-                        <NavLink to = "/woman/products" onClick = { e => { productStore.setFiltersClient( "type_id", 2 ) } }>Hoodie</NavLink>
-                        <NavLink to = "/woman/products" onClick = { e => { productStore.setFiltersClient( "type_id", 4 ) } }>Jacket</NavLink>
-                    </div>
-                }
-            }
+            else
+            return <h2>Not Found</h2>
         } 
     }
 }

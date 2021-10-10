@@ -16,7 +16,6 @@ export const BrandStore = types.model({
         const result = await service.getAllBrands();
         if( result.length === 0 )
         return self.brands;
-        debugger
         self.brands = result
         console.log("Brands",self.brands)
     },

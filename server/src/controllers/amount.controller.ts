@@ -45,9 +45,29 @@ export class AmountController {
         }
     }
 
+    public getOneSizeByProductId = async( request: express.Request, response: express.Response ) => {
+        try {
+            let result = await this.service.getOneSizeByProductId( request.params.id, request.body );
+            response.send( result );
+        }
+        catch ( err ) {
+            response.send( "amount controller, getByProductId" + err );
+        }
+    }
+
     public edit = async ( request: express.Request, response: express.Response ) => {
         try {
             const updatedAmount = await this.service.edit( request.params.id, request.body );
+            response.send( updatedAmount );
+        }
+        catch ( err ) {
+            response.send( "amount controller, edit" + err );
+        }
+    }
+
+    public incrementAmount = async ( request: express.Request, response: express.Response ) => {
+        try {
+            const updatedAmount = await this.service.incrementAmount( request.params.id, request.body );
             response.send( updatedAmount );
         }
         catch ( err ) {

@@ -5,16 +5,29 @@ import '../App.css';
 import { ApiServices } from '../services/api-services/product-service';
 
 const service: ApiServices = new ApiServices();
-export let productFilters = new Map();
+let productFilters = new Map();
 export let filters: any = {};
+
+export const productModel = ProductItem.create({
+  id: 0
+});
 
 export const ProductStore = types.model({
   products: types.array( ProductItem ),
-  gender: types.optional( types.string, "" )
+  gender: types.optional( types.string, "" ),
+  bagProducts: types.array( ProductItem ),
+  totalPrice: types.optional( types.number, 0 )
 })
-.actions(self => ({
+.actions( self => ({
+
+  async getProductById ( id: string | number ) {
+    const result = await service.getOneProduct( id );
+    let itemArray : any = [ result ];
+    self.products = itemArray;
+    return self.products;
+  },
+
   async getProductsByGender ( id: number ) {
-    debugger
     const result = await service.getProductsByGender( id );
     if( result.length === 0 )
     return self.products;
@@ -22,22 +35,19 @@ export const ProductStore = types.model({
     console.log(self.products.length)
   },
 
-  async setFilters ( key: string, value: string | number ) {
-    productFilters.set( key, value );
-    if( key === "gender_id" ) {
-      self.gender = value === 1 ? "man" : "woman";
-    }
-  },
-
   async setFiltersClient ( key: string, value: string | number ) {
 
     if( filters[key] ) {
+      
+      let position = filters[key].indexOf( value );
 
-      let isExist = filters[key].indexOf( value );
-
-      if( isExist !== -1 ) {
+      if( position !== -1 ) {
         if( key !== "gender_id")
-        filters[ key ].splice( filters[ key ].indexOf( value ), 1) 
+        filters[ key ].splice( filters[ key ].indexOf( value ), 1);
+
+        if( filters[ key ].length === 0) {
+          delete filters[ key ];
+        }
       }
       else {
         filters[key].push( value );
@@ -46,41 +56,38 @@ export const ProductStore = types.model({
     else {
       filters[key] = [];
       filters[key].push( value );
-      debugger
     }
-    console.log(filters);
   },
 
   async applyFilters () {
-    debugger
-    filters.type_id = [2,4];
-    filters.gender_id = [2];
     let result = await service.getProductsByFilter( filters );
-
-    self.products = result;
-
-
+    
+    if( result.length && !result.includes("error") && !result.includes("Error") ) {
+      self.products = result;
+    }
+    else {
+      alert("Произошла ошибка, перезагрузите страницу");
+    }
   },
 
-  async getProductsByFilters(){
-    debugger
-    let data = {
-      filters: Object.fromEntries( productFilters ),
-    }
+  // async getProductsByFilters(){
+  //   let data = {
+  //     filters: Object.fromEntries( productFilters ),
+  //   }
 
-    let result = await service.getProductsByFilter( filters );
+  //   let result = await service.getProductsByFilter( filters );
 
-    if( result.length === 0 )
-    return self.products;
-    self.products = result;
-  }
+  //   if( result.length === 0 )
+  //   return self.products;
 
+  //   self.products = result;
+  // },
 
+  async getByIds ( ids: Array<string> ) {
+    let result = await service.getProductsByIds( ids );
+    self.bagProducts = result;
+  },
 }))
-
-export const model = ProductItem.create({
-  id: 0
-});
 
 export const productStore = ProductStore.create({});
 unprotect( productStore );

@@ -1,9 +1,9 @@
 import { observer } from 'mobx-react';
-import React, { Props } from 'react';
-import { NavLink, Route, Switch } from 'react-router-dom';
-import { ProductItem } from './product-item.component';
+import React from 'react';
+import { Route, Switch } from 'react-router-dom';
 import { brandStore } from '../stores/brand.store';
-import { filters, productFilters, productStore } from '../stores/product.store';
+import { filters, productStore } from '../stores/product.store';
+import { ProductsListComponent } from './products.list.component';
 
 interface IReactRouterParams {
     match: any
@@ -13,50 +13,42 @@ interface IReactRouterParams {
 export class ProductsComponent extends React.Component< IReactRouterParams, {} > {
     
     componentDidMount() {
-        let genderId = this.props.match.params.gender;
+        alert("Check in bag,, check render in products, routes, apply filters client()");
         ( async () => {
             await brandStore.getAllBrands();
         })();
-
-
-        if ( !filters["gender_id"] && !filters["type_id"] ){
-            if ( genderId === "man") {
-                productStore.getProductsByGender( 1 );
-            }
-            else {
-                productStore.getProductsByGender( 2 );
-            }
-        }
-        else {
-            debugger
-            genderId === "man" ? productStore.setFiltersClient( "gender_id", 1 ) : productStore.setFiltersClient( "gender_id", 2 );
-            productStore.getProductsByFilters();
-        }
     }
     render() {
         let genderId = this.props.match.params.gender;
+
+        // Check if filters are applied
+        if ( !filters["gender_id"] && !filters["type_id"] ){
+            if ( genderId === "men") {
+                productStore.getProductsByGender( 1 );
+                productStore.setFiltersClient( "gender_id", 1 );
+            }
+            else if ( genderId === "woman" ) {
+                productStore.getProductsByGender( 2 );
+                productStore.setFiltersClient( "gender_id", 2 );
+            }
+            else {
+                return <h2>Not Found</h2>
+            }
+        }
+        else if ( genderId === "men" || genderId === "woman" ) {
+            genderId === "men" ? productStore.setFiltersClient( "gender_id", 1 ) : productStore.setFiltersClient( "gender_id", 2 );
+            productStore.applyFilters();
+        }
+        else {
+            return <h2>Not Found</h2>
+        }
+        
         return <div className="products-wrapper">
-            <Switch>
-                <Route path = "/:gender/products/:id" component = {ProductItem}/>
-            </Switch>
-            <div className="filters">
-                {
-                    brandStore.brands.map( brand => {
-                        return ( <div>
-                            <input type="checkbox" id = { brand.id } name = { brand.id } onChange = { e => { productStore.setFiltersClient( "brand_id", brand.id ) } }/>
-                            <label>{ brand.id }</label>
-                        </div>)
-                    } )
-                }
-                <button onClick = { e => { productStore.applyFilters() } }>Apply Filters</button>
-            </div>
-        <h1>Products</h1>
-        <ul>
-        { productStore.products.map( productItem => {
-            return <li key = { productItem.id }><NavLink to={`/${genderId}/products/${productItem.id}`}>Name: { productItem.name }, Gender: { productItem.gender_id }, Brand: { productItem.brand_id }, Type: { productItem.type_id }</NavLink></li>
-        }) }
-        </ul>
-       
+            <h2>STORE</h2>
+            {/* <Switch>
+                <Route exact path = "/:gender/products" component = {ProductsListComponent}/>
+            </Switch> */}
+            <ProductsListComponent match = { this.props.match }/>
     </div>
     }
 }

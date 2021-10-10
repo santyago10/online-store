@@ -17,6 +17,7 @@ export class ProductRoute implements Route {
   private initializeRoutes() {
     this.router.post( this.path, authenticationMiddleware(),  this.controller.create );
     this.router.post( "/byFilters", this.controller.getByFilters );
+    this.router.post( "/byIds", this.controller.getByIds );
     this.router.get( this.path, this.controller.getAll );
     this.router.get( `${this.path}/:id`, this.controller.getById );
     this.router.get( `${this.genderPath}/:id`, this.controller.getByGender );

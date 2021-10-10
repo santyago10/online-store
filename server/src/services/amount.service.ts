@@ -6,10 +6,12 @@ import Product from "../models/product.entity";
 export class AmountService {
     private amountRepository;
     private productRepository;
+    private manager;
     
     constructor(){
         this.amountRepository = getRepository( Amount );
         this.productRepository = getRepository( Product );
+        this.manager = this.amountRepository.manager;
     }
 
     public create = async ( body: Object ) => {
@@ -52,13 +54,40 @@ export class AmountService {
         catch( err ) {
             return ( "amount service, getByProductId" + err );
         }
-
     }
 
-    public edit = async ( id, body: Object ) => {
+    public getOneSizeByProductId = async ( id, body ) => {
+        try {
+            let productId = await this.productRepository.findOne( id );
+            // let resultsByProduct = await this.amountRepository.find( { product_: productId } );
+            let resultsByProduct = await this.amountRepository.query(`SELECT * FROM amount WHERE product_id=${ productId.id } AND size_id='${ body.productSize }'`);
+            return resultsByProduct.length > 0 ? resultsByProduct : "Product with this id isn't exist";
+        }
+        catch( err ) {
+            return ( "amount service, getByProductId" + err );
+        }
+    }
+
+    public edit = async ( id, body: any ) => {
         try{ 
-            await this.amountRepository.update( id, body );
-            const updatedAmount = await this.amountRepository.findOne( id );
+            await this.manager.decrement(Amount, { product_: id, size_: body.product_size }, "amount", body.newAmount );
+            const updatedAmount = await this.amountRepository.findOne( { product_: id, size_: body.product_size } );
+            if ( updatedAmount ) {
+                return updatedAmount;
+            } 
+            else {
+                return("Not Found " + id);
+            }
+        }
+        catch ( err ) {
+            return ( "amount service, edit" + err );
+        }
+    }
+
+    public incrementAmount = async ( id, body: any ) => {
+        try{ 
+            await this.manager.increment(Amount, { product_: id, size_: body.product_size }, "amount", body.newAmount );
+            const updatedAmount = await this.amountRepository.findOne( { product_: id, size_: body.product_size } );
             if ( updatedAmount ) {
                 return updatedAmount;
             } 
